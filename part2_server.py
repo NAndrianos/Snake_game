@@ -19,8 +19,8 @@ class Server:
         print(f"The server is listening on port {self.port}")
         while True:
             message, clientAddress = self.serverSocket.recvfrom(self.bufferSize)
-            ignoreMessageFlag = (random.random() < 0.1) # create a flag with a 10% probability to simulate packet loss
-            if ignoreMessageFlag:
+            ignoreMessageFlag = True if random.random() < 0.1 else False # create a flag with a 10% probability to simulate packet loss
+            if ignoreMessageFlag is True:
                 continue
             else:
                 responseMessage = ' '.join(message.decode().split(' ')[:3]) + " ditto" # perform string manipulation to the desired format

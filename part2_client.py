@@ -21,14 +21,12 @@ class Client:
     def ping(self, request: str):
         try: # use a try/except to handle a timeout from the server side
             tripStartTime = time.time() # save the time of right before the request is made
-            self.clientSocket.sendto(message.encode(), (self.serverName, self.serverPort)) # send request to server
-            response, serverAddress = self.clientSocket.recvfrom(self.bufferSize) # fetch the response
+            self.clientSocket.sendto(request.encode(), (self.serverName, self.serverPort)) # send request to server
+            response, _ = self.clientSocket.recvfrom(self.bufferSize) # fetch the response
             roundTripTime = round(1000 * (time.time() - tripStartTime), 3) # calculate the round-trip-time in ms
             print(f"Request:\t{request}\nResponse:\t{response.decode()}\nRound trip:\t{roundTripTime}ms")
         except timeout:
             print("Request timed out")
-        except Exception:
-            print("Unknown exception occurred")
 
 
 if __name__ == "__main__":
