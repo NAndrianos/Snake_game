@@ -1,43 +1,33 @@
 # Group#: G37
 # Student Names: Ryley McRae & Niko Andrianos
 
-"""
-    This program implements a server for a UDP Pinger 
-    application on a local host.
-"""
-
 from socket import *
-import random
-import time
+import random, time
+
+"""
+    Implements a server for a UDP Pinger application on a local host.
+"""
+class Server:
+    def __init__(self, host: str = "127.0.0.1", port: int = 12000, bufferSize: int = 2048):
+        self.host = host
+        self.port = port
+        self.bufferSize = bufferSize
+        self.serverSocket = socket(AF_INET, SOCK_DGRAM)
+
+    def run(self):
+        self.serverSocket.bind((self.host, self.port))
+        print(f"The server is listening on port {self.port}")
+        while True:
+            message, clientAddress = self.serverSocket.recvfrom(self.bufferSize)
+            ignoreMessageFlag = (random.random() < 0.1) # create a flag with a 10% probability to simulate packet loss
+            if ignoreMessageFlag:
+                continue
+            else:
+                responseMessage = ' '.join(message.decode().split(' ')[:3]) + " ditto" # perform string manipulation to the desired format
+                time.sleep(random.uniform(0.005, 0.050)) # sleep for 5 - 50ms before responding
+                self.serverSocket.sendto(responseMessage.encode(), clientAddress) # send response
+
 
 if __name__ == "__main__":
-    # Create variables to set up server
-    serverPort = 12000
-    serverSocket = socket(AF_INET, SOCK_DGRAM)
-
-    # Bind to specified port
-    serverSocket.bind(("127.0.0.1", serverPort))
-
-    print("The server is ready to recieve!")
-
-    # Unlessed process is killed, let the server listen
-    while True:
-        message, clientAddress = serverSocket.recvfrom(2048)
-
-        # Create a flag with a 10% probability to simulate packet loss
-        ignoreMessageFlag = True if random.random() < 0.1 else False
-
-        # Skip this iteration: 'drop the packet'
-        if ignoreMessageFlag is True:
-            continue
-        
-        # Perform string manipulation to the desired format
-        decodedMessageList = message.decode().split(" ")
-        responseMessage = f"{decodedMessageList[0]} {decodedMessageList[1]} - ditto"
-
-        # Generate a random sleep time between 5 and 50 milliseconds
-        sleepTime = random.uniform(0.005, 0.05)
-        time.sleep(sleepTime)
-
-        # Reply to the client with response message
-        serverSocket.sendto(responseMessage.encode(), clientAddress)
+    server = Server()
+    server.run()
