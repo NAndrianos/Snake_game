@@ -127,7 +127,8 @@ class Game():
         SPEED = 0.15     #speed of snake updates (sec)
         while self.gameNotOver:
             #complete the method implementation below
-            pass #remove this line from your implemenation
+            self.move()
+            time.sleep(SPEED)
 
     def whenAnArrowKeyIsPressed(self, e) -> None:
         """ 
@@ -175,6 +176,15 @@ class Game():
         lastX, lastY = self.snakeCoordinates[-1]
         #complete the method implementation below
 
+        # Check which direction the snake is moving in
+        if self.direction == "Up":
+            return lastX, lastY - SNAKE_ICON_WIDTH
+        elif self.direction == "Right":
+            return lastX + SNAKE_ICON_WIDTH, lastY
+        elif self.direction == "Left":
+            return lastX - SNAKE_ICON_WIDTH, lastY
+        else:
+            return lastX, lastY + SNAKE_ICON_WIDTH
 
     def isGameOver(self, snakeCoordinates) -> None:
         """
@@ -186,6 +196,17 @@ class Game():
         """
         x, y = snakeCoordinates
         #complete the method implementation below
+
+        # If out of bounds or snake bites itself end else do nothing
+        #NOTE: Assume the head of the snake is last element
+        # Since the snake cannot bite it's own head check if
+        # the coordinates are apart of the snakes tail.
+        if (x > WINDOW_WIDTH or x < 0 or
+            y > WINDOW_HEIGHT or y < 0 or
+            any(coord[0] == x and coord[1] == y for coord in self.snakeCoordinates[:-1])):
+
+            self.gameNotOver = False
+            self.queue.put({"game_over": None}) # Add to game queue to trigger GUI exit
 
     def createNewPrey(self) -> None:
         """ 
@@ -201,6 +222,11 @@ class Game():
         THRESHOLD = 15   #sets how close prey can be to borders
         #complete the method implementation below
 
+        # Get a random x and y a threshold away from the window
+        x = random.randint(THRESHOLD, WINDOW_WIDTH-THRESHOLD)
+        y = random.randint(THRESHOLD, WINDOW_HEIGHT-THRESHOLD)
+        preyCoordinates = (x - 5, y - 5, x + 5, y + 5)
+        self.queue.put({"prey": preyCoordinates}) # Add prey to game queue
 
 if __name__ == "__main__":
     #some constants for our GUI
