@@ -160,9 +160,37 @@ class Game():
             The snake coordinates list (representing its length 
             and position) should be correctly updated.
         """
-        NewSnakeCoordinates = self.calculateNewCoordinates()
-        #complete the method implementation below
+        def isPreyCaptured(snakeCoordinates) -> bool:
+            snakeX = snakeCoordinates[0]
+            snakeY = snakeCoordinates[1]
+            if snakeX < self.preyCoordinates[0] or snakeX > self.preyCoordinates[2]:
+                return False # head not in the same column
+            if snakeY < self.preyCoordinates[1] or snakeY > self.preyCoordinates[3]:
+                return False # head not in the same row
+            return True 
 
+        # calculate the new coordinate of the snake head
+        newSnakeCoordinates = self.calculateNewCoordinates()
+
+        # based on the new coordinates, check if the prey is captured
+        if isPreyCaptured(newSnakeCoordinates):
+            # if so, update score, create new prey, and add "score" task to the queue
+            self.score += 1
+            self.createNewPrey()
+            self.queue.put({"score": self.score})
+            # if the snake captures the prey, the tail stays in place (do nothing)
+        else:
+            # otherwise, we update the location of the tail by removing the first segment
+            self.snakeCoordinates.pop(0)
+
+        # next, update the location of the head of the snake. this is done after
+        # updating the location of the tail to avoid a bug where isGameOver()
+        # will think the snake has bitten its tail, but in fact, 
+        # the tail has not yet been updated. in this case, the game would essentially
+        # consider the snake as 1 segment longer than it actually is
+        self.snakeCoordinates.append(newSnakeCoordinates)
+        if not self.isGameOver(newSnakeCoordinates):
+            self.queue.put({"move": self.snakeCoordinates})
 
     def calculateNewCoordinates(self) -> tuple:
         """
@@ -223,10 +251,11 @@ class Game():
         #complete the method implementation below
 
         # Get a random x and y a threshold away from the window
-        x = random.randint(THRESHOLD, WINDOW_WIDTH-THRESHOLD)
-        y = random.randint(THRESHOLD, WINDOW_HEIGHT-THRESHOLD)
-        preyCoordinates = (x - 5, y - 5, x + 5, y + 5)
-        self.queue.put({"prey": preyCoordinates}) # Add prey to game queue
+        x = random.randint(THRESHOLD//5, (WINDOW_WIDTH-THRESHOLD)//5)*5
+        y = random.randint(THRESHOLD//5, (WINDOW_HEIGHT-THRESHOLD)//5)*5
+        self.preyCoordinates = (x - 5, y - 5, x + 5, y + 5)
+        self.queue.put({"prey": self.preyCoordinates}) # Add prey to game queue
+        print(f"prey: {self.preyCoordinates}")
 
 if __name__ == "__main__":
     #some constants for our GUI
