@@ -204,7 +204,7 @@ class Game():
         lastX, lastY = self.snakeCoordinates[-1]
         #complete the method implementation below
 
-        # Check which direction the snake is moving in
+        # check which direction the snake is moving in
         if self.direction == "Up":
             return lastX, lastY - SNAKE_ICON_WIDTH
         elif self.direction == "Right":
@@ -225,16 +225,15 @@ class Game():
         x, y = snakeCoordinates
         #complete the method implementation below
 
-        # If out of bounds or snake bites itself end else do nothing
-        #NOTE: Assume the head of the snake is last element
-        # Since the snake cannot bite it's own head check if
-        # the coordinates are apart of the snakes tail.
+        # if out of bounds or snake bites itself end else do nothing
+        # NOTE: Assume the head of the snake is last element,
+        # since the snake cannot bite it's own head
         if (x > WINDOW_WIDTH or x < 0 or
             y > WINDOW_HEIGHT or y < 0 or
             any(coord[0] == x and coord[1] == y for coord in self.snakeCoordinates[:-1])):
 
             self.gameNotOver = False
-            self.queue.put({"game_over": None}) # Add to game queue to trigger GUI exit
+            self.queue.put({"game_over": None}) # add to game queue to trigger GUI exit
 
     def createNewPrey(self) -> None:
         """ 
@@ -250,11 +249,11 @@ class Game():
         THRESHOLD = 15   #sets how close prey can be to borders
         #complete the method implementation below
 
-        # Get a random x and y a threshold away from the window
+        # get a random x and y a threshold away from the window
         x = random.randint(THRESHOLD//5, (WINDOW_WIDTH-THRESHOLD)//5)*5
         y = random.randint(THRESHOLD//5, (WINDOW_HEIGHT-THRESHOLD)//5)*5
         self.preyCoordinates = (x - 5, y - 5, x + 5, y + 5)
-        self.queue.put({"prey": self.preyCoordinates}) # Add prey to game queue
+        self.queue.put({"prey": self.preyCoordinates}) # add prey to game queue
         print(f"prey: {self.preyCoordinates}")
 
 if __name__ == "__main__":
